@@ -1,58 +1,55 @@
-#include <stdio.h>
 #include <string.h>
+#include <ctype.h>
+#include <stdio.h>
 
-void getKeyMatrix(char key[], int keyMatrix[3][3]) {
-    int k = 0;
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 3; j++) {
-            keyMatrix[i][j] = key[k] % 65;
-            k++;
-        }
-    }
-}
-
-void encrypt(int cipherMatrix[3][1], int keyMatrix[3][3], int plainTextVector[3][1]) {
-    for (int i = 0; i < 3; i++) {
-        for (int j = 0; j < 1; j++) {
-            cipherMatrix[i][j] = 0;
-            for (int k = 0; k < 3; k++) {
-                cipherMatrix[i][j] += keyMatrix[i][k] * plainTextVector[k][j];
-            }
-            cipherMatrix[i][j] %= 26;
-        }
-    }
-}
-
-void HillCipher(char plainText[], char key[]) {
-    int keyMatrix[3][3];
-    getKeyMatrix(key, keyMatrix);
-
-    int plainTextVector[3][1];
-    for (int i = 0; i < 3; i++)
-        plainTextVector[i][0] = plainText[i] % 65;
-
-    int cipherMatrix[3][1];
-    encrypt(cipherMatrix, keyMatrix, plainTextVector);
-
-    char CipherText[4];
-    for (int i = 0; i < 3; i++)
-        CipherText[i] = cipherMatrix[i][0] + 65;
-    CipherText[3] = '\0';
-
-    printf("Ciphertext: %s\n", CipherText);
-}
+void encryption(char msg[] , int key[][100]);
 
 int main() {
-    char plainText[4];
-    char key[10];
-
-    printf("Enter plainText: ");
-    scanf("%s", plainText);
-
-    printf("Enter Key: ");
-    scanf("%s", key);
-
-    HillCipher(plainText, key);
-
+    int key[100][100];
+    char msg[100];
+    printf("Enter the 3 * 3 matrix key: ");
+    
+    for(int i = 0 ; i < 3 ; i++){
+        for(int j = 0 ; j < 3 ; j++){
+            scanf("%d" , &key[i][j]);
+        }
+    }
+    
+    printf("Enter the msg: ");
+    scanf("%s" , msg);
+    
+    printf("The encrypted msg is: ");
+    encryption(msg , key);
+    
     return 0;
+}
+
+void encryption(char msg[] , int key[][100]){
+    
+    int len = strlen(msg);
+    int ciper[len];
+    
+    for(int i = 0 ; i < len ; i++){
+        ciper[i] = msg[i] - 'A';
+    }
+    
+    while(len % 3 != 0){
+        msg[len] = 'X';
+        ciper[len] = 23;
+        len++;
+    }
+    
+    for(int a = 0 ; a < len ; a+=3){
+        for(int i = 0 ; i < 3 ; i++){
+            int sum = 0;
+            
+            for(int j = 0 ; j < 3 ; j++){
+                sum += key[i][j] * ciper[a+j];
+            }
+            
+            msg[a+i] = (sum % 26) + 'A';
+        }
+    }
+    
+    printf("%s" , msg);
 }
